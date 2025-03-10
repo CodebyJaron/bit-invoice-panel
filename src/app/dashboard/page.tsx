@@ -1,5 +1,9 @@
+import { DashboardBlocks } from "@/components/dashboard/dashboard-blocks";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/hooks/use-user";
 import prisma from "@/server/db";
+import { Suspense } from "react";
 
 async function getData(userId: string) {
     const data = await prisma.invoice.findMany({
@@ -20,7 +24,20 @@ export default async function DashboardRoute() {
 
     return (
         <>
-            <h1>Hello</h1>
+            {data.length < 1 ? (
+                <EmptyState
+                    title="No invoices found"
+                    description="Create an invoice to see it right here"
+                    buttontext="Create Invoice"
+                    href="/dashboard/invoices/create"
+                />
+            ) : (
+                <Suspense
+                    fallback={<Skeleton className="w-full h-full flex-1" />}
+                >
+                    <DashboardBlocks />
+                </Suspense>
+            )}
         </>
     );
 }
