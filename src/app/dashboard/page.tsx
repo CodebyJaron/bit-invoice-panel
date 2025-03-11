@@ -26,9 +26,9 @@ export default async function DashboardRoute() {
         <>
             {data.length < 1 ? (
                 <EmptyState
-                    title="No invoices found"
-                    description="Create an invoice to see it right here"
-                    buttontext="Create Invoice"
+                    title="Geen facturen gevonden"
+                    description="Je hebt nog geen facturen aangemaakt. Maak nu een factuur aan."
+                    buttontext="Maak een factuur aan"
                     href="/dashboard/invoices/create"
                 />
             ) : (

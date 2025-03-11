@@ -34,6 +34,8 @@ async function getUser(userId: string) {
     if (!data?.firstName || !data.lastName || !data.address) {
         redirect("/auth/onboarding");
     }
+
+    return data;
 }
 
 export default async function DashboardLayout({
@@ -96,7 +98,7 @@ export default async function DashboardLayout({
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>
-                                        My Account
+                                        {data.firstName} {data.lastName}
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
@@ -104,7 +106,7 @@ export default async function DashboardLayout({
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/dashboard/invoices">
-                                            Invoices
+                                            Facturen
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -117,7 +119,7 @@ export default async function DashboardLayout({
                                             }}
                                         >
                                             <button className="w-full text-left">
-                                                Log out
+                                                Uitloggen
                                             </button>
                                         </form>
                                     </DropdownMenuItem>

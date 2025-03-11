@@ -19,17 +19,17 @@ export default function InvoicesRoute() {
                 <div className="flex items-center justify-between">
                     <div>
                         <CardTitle className="text-2xl font-bold">
-                            Invoices
+                            Facturen
                         </CardTitle>
                         <CardDescription>
-                            Manage your invoices right here
+                            Beheer uw facturen hier
                         </CardDescription>
                     </div>
                     <Link
                         href="/dashboard/invoices/create"
                         className={buttonVariants()}
                     >
-                        <PlusIcon /> Create Invoice
+                        <PlusIcon /> Maak nieuwe factuur
                     </Link>
                 </div>
             </CardHeader>

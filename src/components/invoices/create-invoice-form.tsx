@@ -42,9 +42,9 @@ export function CreateInvoiceForm({
     lastName,
 }: iAppProps) {
     const [lastResult, action] = useActionState(createInvoice, undefined);
+
     const [form, fields] = useForm({
         lastResult,
-
         onValidate({ formData }) {
             return parseWithZod(formData, {
                 schema: invoiceSchema,
@@ -56,11 +56,23 @@ export function CreateInvoiceForm({
     });
 
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [rate, setRate] = useState("");
-    const [quantity, setQuantity] = useState("");
-    const [currency, setCurrency] = useState("USD");
+    const [currency, setCurrency] = useState<"USD" | "EUR">("USD");
 
-    const calcualteTotal = (Number(quantity) || 0) * (Number(rate) || 0);
+    const [invoiceItems, setInvoiceItems] = useState([
+        { description: "", quantity: "", rate: "" },
+    ]);
+
+    const calcualteTotal = invoiceItems.reduce(
+        (acc, item) =>
+            acc + (Number(item.quantity) || 0) * (Number(item.rate) || 0),
+        0
+    );
+
+    const addInvoiceItem = () =>
+        setInvoiceItems([
+            ...invoiceItems,
+            { description: "", quantity: "", rate: "" },
+        ]);
 
     return (
         <Card className="w-full max-w-4xl mx-auto">
@@ -81,6 +93,12 @@ export function CreateInvoiceForm({
                         type="hidden"
                         name={fields.total.name}
                         value={calcualteTotal}
+                    />
+
+                    <input
+                        type="hidden"
+                        name="invoiceItems"
+                        value={JSON.stringify(invoiceItems)}
                     />
 
                     <div className="flex flex-col gap-1 w-fit mb-6">
@@ -126,7 +144,9 @@ export function CreateInvoiceForm({
                                 defaultValue="USD"
                                 name={fields.currency.name}
                                 key={fields.currency.key}
-                                onValueChange={(value) => setCurrency(value)}
+                                onValueChange={(value: "USD" | "EUR") =>
+                                    setCurrency(value)
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Currency" />
@@ -232,7 +252,6 @@ export function CreateInvoiceForm({
                                         className="w-[280px] text-left justify-start"
                                     >
                                         <CalendarIcon />
-
                                         {selectedDate ? (
                                             new Intl.DateTimeFormat("en-US", {
                                                 dateStyle: "long",
@@ -282,6 +301,7 @@ export function CreateInvoiceForm({
                         </div>
                     </div>
 
+                    {/* Invoice Items sectie */}
                     <div>
                         <div className="grid grid-cols-12 gap-4 mb-2 font-medium">
                             <p className="col-span-6">Description</p>
@@ -290,69 +310,76 @@ export function CreateInvoiceForm({
                             <p className="col-span-2">Amount</p>
                         </div>
 
-                        <div className="grid grid-cols-12 gap-4 mb-4">
-                            <div className="col-span-6">
-                                <Textarea
-                                    name={fields.invoiceItemDescription.name}
-                                    key={fields.invoiceItemDescription.key}
-                                    defaultValue={
-                                        fields.invoiceItemDescription
-                                            .initialValue
-                                    }
-                                    placeholder="Item name & description"
-                                />
-                                <p className="text-red-500 text-sm">
-                                    {fields.invoiceItemDescription.errors}
-                                </p>
+                        {invoiceItems.map((item, index) => (
+                            <div
+                                key={index}
+                                className="grid grid-cols-12 gap-4 mb-4"
+                            >
+                                <div className="col-span-6">
+                                    <Textarea
+                                        value={item.description}
+                                        onChange={(e) => {
+                                            const newItems = [...invoiceItems];
+                                            newItems[index].description =
+                                                e.target.value;
+                                            setInvoiceItems(newItems);
+                                        }}
+                                        placeholder="Item name & description"
+                                    />
+                                </div>
+                                <div className="col-span-2">
+                                    <Input
+                                        type="number"
+                                        value={item.quantity}
+                                        onChange={(e) => {
+                                            const newItems = [...invoiceItems];
+                                            newItems[index].quantity =
+                                                e.target.value;
+                                            setInvoiceItems(newItems);
+                                        }}
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <div className="col-span-2">
+                                    <Input
+                                        type="number"
+                                        value={item.rate}
+                                        onChange={(e) => {
+                                            const newItems = [...invoiceItems];
+                                            newItems[index].rate =
+                                                e.target.value;
+                                            setInvoiceItems(newItems);
+                                        }}
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <div className="col-span-2">
+                                    <Input
+                                        disabled
+                                        value={formatCurrency({
+                                            amount:
+                                                (Number(item.quantity) || 0) *
+                                                (Number(item.rate) || 0),
+                                            currency: currency,
+                                        })}
+                                    />
+                                </div>
                             </div>
-                            <div className="col-span-2">
-                                <Input
-                                    name={fields.invoiceItemQuantity.name}
-                                    key={fields.invoiceItemQuantity.key}
-                                    type="number"
-                                    placeholder="0"
-                                    value={quantity}
-                                    onChange={(e) =>
-                                        setQuantity(e.target.value)
-                                    }
-                                />
-                                <p className="text-red-500 text-sm">
-                                    {fields.invoiceItemQuantity.errors}
-                                </p>
-                            </div>
-                            <div className="col-span-2">
-                                <Input
-                                    name={fields.invoiceItemRate.name}
-                                    key={fields.invoiceItemRate.key}
-                                    value={rate}
-                                    onChange={(e) => setRate(e.target.value)}
-                                    type="number"
-                                    placeholder="0"
-                                />
-                                <p className="text-red-500 text-sm">
-                                    {fields.invoiceItemRate.errors}
-                                </p>
-                            </div>
-                            <div className="col-span-2">
-                                <Input
-                                    value={formatCurrency({
-                                        amount: calcualteTotal,
-                                        currency: currency as any,
-                                    })}
-                                    disabled
-                                />
-                            </div>
-                        </div>
+                        ))}
+
+                        <Button type="button" onClick={addInvoiceItem}>
+                            Add Item
+                        </Button>
                     </div>
 
-                    <div className="flex justify-end">
+                    <div className="flex justify-end mt-6">
                         <div className="w-1/3">
                             <div className="flex justify-between py-2">
                                 <span>Subtotal</span>
                                 <span>
                                     {formatCurrency({
                                         amount: calcualteTotal,
-                                        currency: currency as any,
+                                        currency: currency,
                                     })}
                                 </span>
                             </div>
@@ -361,7 +388,7 @@ export function CreateInvoiceForm({
                                 <span className="font-medium underline underline-offset-2">
                                     {formatCurrency({
                                         amount: calcualteTotal,
-                                        currency: currency as any,
+                                        currency: currency,
                                     })}
                                 </span>
                             </div>
@@ -382,9 +409,7 @@ export function CreateInvoiceForm({
                     </div>
 
                     <div className="flex items-center justify-end mt-6">
-                        <div>
-                            <SubmitButton text="Send Invoice to Client" />
-                        </div>
+                        <SubmitButton text="Send Invoice to Client" />
                     </div>
                 </form>
             </CardContent>

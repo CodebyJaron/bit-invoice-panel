@@ -12,6 +12,7 @@ import { EmptyState } from "../dashboard/empty-state";
 import { Badge } from "../ui/badge";
 import { InvoiceActions } from "./invoice-action";
 import { formatCurrency } from "@/lib/utils";
+import { InvoiceStatus } from "@prisma/client";
 
 async function getData(userId: string) {
     const data = await prisma.invoice.findMany({
@@ -41,23 +42,21 @@ export async function InvoiceList() {
         <>
             {data.length === 0 ? (
                 <EmptyState
-                    title="No invoices found"
-                    description="Create an invoice to get started"
-                    buttontext="Create invoice"
+                    title="Geen facturen gevonden"
+                    description="Je hebt nog geen facturen aangemaakt. Maak nu een factuur aan."
+                    buttontext="Maak een factuur aan"
                     href="/dashboard/invoices/create"
                 />
             ) : (
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Invoice ID</TableHead>
-                            <TableHead>Customer</TableHead>
-                            <TableHead>Amount</TableHead>
+                            <TableHead>Factuurnummer</TableHead>
+                            <TableHead>Klant</TableHead>
+                            <TableHead>Bedrag</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead className="text-right">
-                                Actions
-                            </TableHead>
+                            <TableHead>Datum</TableHead>
+                            <TableHead className="text-right">Acties</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -72,10 +71,18 @@ export async function InvoiceList() {
                                     })}
                                 </TableCell>
                                 <TableCell>
-                                    <Badge>{invoice.status}</Badge>
+                                    {invoice.status === InvoiceStatus.PAID ? (
+                                        <Badge className="bg-green-500">
+                                            Betaald
+                                        </Badge>
+                                    ) : (
+                                        <Badge className="bg-yellow-500">
+                                            Openstaand
+                                        </Badge>
+                                    )}
                                 </TableCell>
                                 <TableCell>
-                                    {new Intl.DateTimeFormat("en-US", {
+                                    {new Intl.DateTimeFormat("nl-NL", {
                                         dateStyle: "medium",
                                     }).format(invoice.createdAt)}
                                 </TableCell>

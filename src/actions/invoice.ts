@@ -6,6 +6,7 @@ import prisma from "@/server/db";
 import { emailClient } from "@/server/email";
 import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "next/navigation";
+import { sendInvoiceEmail } from "./email";
 
 export async function createInvoice(prevState: any, formData: FormData) {
     const session = await requireUser();
@@ -29,43 +30,17 @@ export async function createInvoice(prevState: any, formData: FormData) {
             fromAddress: submission.value.fromAddress,
             fromEmail: submission.value.fromEmail,
             fromName: submission.value.fromName,
-            invoiceItemDescription: submission.value.invoiceItemDescription,
-            invoiceItemQuantity: submission.value.invoiceItemQuantity,
-            invoiceItemRate: submission.value.invoiceItemRate,
             invoiceName: submission.value.invoiceName,
             invoiceNumber: submission.value.invoiceNumber,
             status: submission.value.status,
             total: submission.value.total,
             note: submission.value.note,
             userId: session.user?.id,
+            invoiceItems: submission.value.invoiceItems,
         },
     });
 
-    const sender = {
-        email: "hello@demomailtrap.com",
-        name: "Jan Marshal",
-    };
-
-    emailClient.send({
-        from: sender,
-        to: [{ email: "jan@alenix.de" }],
-        template_uuid: "3c01e4ee-a9ed-4cb6-bbf7-e57c2ced6c94",
-        template_variables: {
-            clientName: submission.value.clientName,
-            invoiceNumber: submission.value.invoiceNumber,
-            invoiceDueDate: new Intl.DateTimeFormat("en-US", {
-                dateStyle: "long",
-            }).format(new Date(submission.value.date)),
-            invoiceAmount: formatCurrency({
-                amount: submission.value.total,
-                currency: submission.value.currency as any,
-            }),
-            invoiceLink:
-                process.env.NODE_ENV !== "production"
-                    ? `http://localhost:3000/api/invoice/${data.id}`
-                    : `https://invoice-marshal.vercel.app/api/invoice/${data.id}`,
-        },
-    });
+    await sendInvoiceEmail(data.clientEmail, data.id);
 
     return redirect("/dashboard/invoices");
 }
@@ -96,14 +71,12 @@ export async function editInvoice(prevState: any, formData: FormData) {
             fromAddress: submission.value.fromAddress,
             fromEmail: submission.value.fromEmail,
             fromName: submission.value.fromName,
-            invoiceItemDescription: submission.value.invoiceItemDescription,
-            invoiceItemQuantity: submission.value.invoiceItemQuantity,
-            invoiceItemRate: submission.value.invoiceItemRate,
             invoiceName: submission.value.invoiceName,
             invoiceNumber: submission.value.invoiceNumber,
             status: submission.value.status,
             total: submission.value.total,
             note: submission.value.note,
+            invoiceItems: submission.value.invoiceItems,
         },
     });
 
@@ -163,4 +136,27 @@ export async function MarkAsPaidAction(invoiceId: string) {
     });
 
     return redirect("/dashboard/invoices");
+}
+
+export async function SendReminderAction(invoiceId: string) {
+    const session = await requireUser();
+
+    const invoice = await prisma.invoice.findUnique({
+        where: {
+            userId: session.user?.id,
+            id: invoiceId,
+        },
+    });
+
+    if (!invoice) {
+        return {
+            error: "Factuur niet gevonden",
+        };
+    }
+
+    await sendInvoiceEmail(invoice?.clientEmail as string, invoiceId);
+
+    return {
+        success: "Factuur is verzonden",
+    };
 }
