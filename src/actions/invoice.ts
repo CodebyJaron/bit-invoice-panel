@@ -36,6 +36,48 @@ export async function createInvoice(prevState: any, formData: FormData) {
             total: submission.value.total,
             note: submission.value.note,
             userId: session.user?.id,
+            automaticReminder: submission.value.automaticReminder,
+            invoiceItems: submission.value.invoiceItems,
+        },
+    });
+
+    await sendInvoiceEmail(data.clientEmail, data.id);
+
+    return redirect("/dashboard/invoices");
+}
+
+export async function updateInvoice(prevState: any, formData: FormData) {
+    const session = await requireUser();
+
+    const submission = parseWithZod(formData, {
+        schema: invoiceSchema,
+    });
+
+    if (submission.status !== "success") {
+        return submission.reply();
+    }
+
+    const data = await prisma.invoice.update({
+        where: {
+            id: formData.get("id") as string,
+            userId: session.user?.id,
+        },
+        data: {
+            clientAddress: submission.value.clientAddress,
+            clientEmail: submission.value.clientEmail,
+            clientName: submission.value.clientName,
+            currency: submission.value.currency,
+            date: submission.value.date,
+            dueDate: submission.value.dueDate,
+            fromAddress: submission.value.fromAddress,
+            fromEmail: submission.value.fromEmail,
+            fromName: submission.value.fromName,
+            invoiceName: submission.value.invoiceName,
+            invoiceNumber: submission.value.invoiceNumber,
+            status: submission.value.status,
+            total: submission.value.total,
+            note: submission.value.note,
+            automaticReminder: submission.value.automaticReminder,
             invoiceItems: submission.value.invoiceItems,
         },
     });
@@ -138,6 +180,22 @@ export async function MarkAsPaidAction(invoiceId: string) {
     return redirect("/dashboard/invoices");
 }
 
+export async function MarkAsUnpaidAction(invoiceId: string) {
+    const session = await requireUser();
+
+    const data = await prisma.invoice.update({
+        where: {
+            userId: session.user?.id,
+            id: invoiceId,
+        },
+        data: {
+            status: "PENDING",
+        },
+    });
+
+    return redirect("/dashboard/invoices");
+}
+
 export async function SendReminderAction(invoiceId: string) {
     const session = await requireUser();
 
@@ -154,7 +212,7 @@ export async function SendReminderAction(invoiceId: string) {
         };
     }
 
-    await sendInvoiceEmail(invoice?.clientEmail as string, invoiceId);
+    await sendInvoiceEmail(invoice?.clientEmail as string, invoiceId, true);
 
     return {
         success: "Factuur is verzonden",

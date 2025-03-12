@@ -1,32 +1,21 @@
 import { z } from "zod";
 
 export const invoiceSchema = z.object({
-    invoiceName: z.string().min(1, "Invoice Name is required"),
-    total: z.number().min(1, "1$ is minimum"),
-
+    invoiceName: z.string().min(1, "Factuurnaam is verplicht"),
+    total: z.number().min(1, "Minimaal $1 vereist"),
     status: z.enum(["PAID", "PENDING"]).default("PENDING"),
-
-    date: z.string().min(1, "Date is required"),
-
-    dueDate: z.number().min(0, "Due Date is required"),
-
-    fromName: z.string().min(1, "Your name is required"),
-
-    fromEmail: z.string().email("Invalid Email address"),
-
-    fromAddress: z.string().min(1, "Your address is required"),
-
-    clientName: z.string().min(1, "Client name is required"),
-
-    clientEmail: z.string().email("Invalid Email address"),
-
-    clientAddress: z.string().min(1, "Client address is required"),
-
-    currency: z.string().min(1, "Currency is required"),
-
-    invoiceNumber: z.number().min(1, "Minimum invoice number of 1"),
-
+    date: z.string().min(1, "Datum is verplicht"),
+    dueDate: z.number().min(0, "Vervaldatum is verplicht"),
+    fromName: z.string().min(1, "Uw naam is verplicht"),
+    fromEmail: z.string().email("Ongeldig e-mailadres"),
+    fromAddress: z.string().min(1, "Uw adres is verplicht"),
+    clientName: z.string().min(1, "Klantnaam is verplicht"),
+    clientEmail: z.string().email("Ongeldig e-mailadres"),
+    clientAddress: z.string().min(1, "Klantadres is verplicht"),
+    currency: z.string().min(1, "Valuta is verplicht"),
+    invoiceNumber: z.number().min(1, "Factuurnummer moet minimaal 1 zijn"),
     note: z.string().optional(),
+    automaticReminder: z.boolean().default(false),
 
     invoiceItems: z.preprocess(
         (val) => {
@@ -41,9 +30,9 @@ export const invoiceSchema = z.object({
         },
         z.array(
             z.object({
-                description: z.string().min(1, "Description is required"),
-                quantity: z.number().min(1, "Quantity min 1"),
-                rate: z.number().min(1, "Rate min 1"),
+                description: z.string().min(1, "Beschrijving is verplicht"),
+                quantity: z.number().min(1, "Hoeveelheid moet minimaal 1 zijn"),
+                rate: z.number().min(1, "Tarief moet minimaal 1 zijn"),
             })
         )
     ),

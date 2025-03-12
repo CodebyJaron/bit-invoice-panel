@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const onboardingSchema = z.object({
-    firstName: z.string().min(2, "First name is required"),
-    lastName: z.string().min(2, "Last name is required"),
-    address: z.string().min(2, "Address is required"),
+    firstName: z.string().min(2, "Voornaam is verplicht"),
+    lastName: z.string().min(2, "Achternaam is verplicht"),
+    address: z.string().min(2, "Adres is verplicht"),
 });

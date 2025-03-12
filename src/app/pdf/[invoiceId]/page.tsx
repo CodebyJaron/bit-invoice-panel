@@ -1,5 +1,6 @@
 import { formatCurrency } from "@/lib/utils";
 import prisma from "@/server/db";
+import { InvoiceStatus } from "@prisma/client";
 import { format } from "date-fns";
 
 async function getInvoice(id: string) {
@@ -19,9 +20,9 @@ async function getInvoice(id: string) {
 export default async function InvoicePDF({
     params,
 }: {
-    params: { id: string };
+    params: { invoiceId: string };
 }) {
-    const invoice = await getInvoice(params.id);
+    const invoice = await getInvoice(params.invoiceId);
     const dueDate = new Date(invoice.date);
     dueDate.setDate(dueDate.getDate() + invoice.dueDate);
 
@@ -36,7 +37,6 @@ export default async function InvoicePDF({
 
     return (
         <div className="p-8 max-w-4xl mx-auto bg-white print:max-w-full print:mx-0 print:p-0 print:bg-white">
-            {/* Invoice Header */}
             <div className="flex justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">
@@ -61,7 +61,6 @@ export default async function InvoicePDF({
                 </div>
             </div>
 
-            {/* Client Information */}
             <div className="mb-8 p-4 bg-gray-50 rounded print:bg-gray-50">
                 <h3 className="text-lg font-semibold mb-2">Factuur aan:</h3>
                 <p className="font-medium">{invoice.clientName}</p>
@@ -69,13 +68,11 @@ export default async function InvoicePDF({
                 <p>{invoice.clientEmail}</p>
             </div>
 
-            {/* Invoice Description */}
             <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-2">Factuur voor:</h3>
                 <p>{invoice.invoiceName}</p>
             </div>
 
-            {/* Invoice Items */}
             <table className="w-full mb-8 border-collapse">
                 <thead>
                     <tr className="bg-gray-100 print:bg-gray-100">
@@ -134,7 +131,6 @@ export default async function InvoicePDF({
                 </tfoot>
             </table>
 
-            {/* Payment Information */}
             <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-2">
                     Betalingsinformatie:
@@ -144,17 +140,18 @@ export default async function InvoicePDF({
                     Status:{" "}
                     <span
                         className={`font-semibold ${
-                            invoice.status === "PAID"
+                            invoice.status === InvoiceStatus.PAID
                                 ? "text-green-600"
                                 : "text-orange-600"
                         }`}
                     >
-                        {invoice.status === "PAID" ? "Betaald" : "Openstaand"}
+                        {invoice.status === InvoiceStatus.PAID
+                            ? "Betaald"
+                            : "Openstaand"}
                     </span>
                 </p>
             </div>
 
-            {/* Notes */}
             {invoice.note && (
                 <div className="mb-8">
                     <h3 className="text-lg font-semibold mb-2">Opmerkingen:</h3>

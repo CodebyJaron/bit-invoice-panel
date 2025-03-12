@@ -22,8 +22,10 @@ import { useState } from "react";
 import {
     DeleteInvoice,
     MarkAsPaidAction,
+    MarkAsUnpaidAction,
     SendReminderAction,
 } from "@/actions/invoice";
+import { InvoiceStatus } from "@prisma/client";
 
 interface iAppProps {
     id: string;
@@ -33,6 +35,7 @@ interface iAppProps {
 export function InvoiceActions({ id, status }: iAppProps) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [markAsPaidDialogOpen, setMarkAsPaidDialogOpen] = useState(false);
+    const [markAsUnpaidDialogOpen, setMarkAsUnpaidDialogOpen] = useState(false); // Toegevoegd
     const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
 
     const handleSendReminder = () => {
@@ -59,6 +62,14 @@ export function InvoiceActions({ id, status }: iAppProps) {
         setMarkAsPaidDialogOpen(false);
     };
 
+    const handleMarkAsUnpaid = async () => {
+        toast.promise(MarkAsUnpaidAction(id), {
+            success: "Factuur succesvol gemarkeerd als onbetaald!",
+        });
+
+        setMarkAsUnpaidDialogOpen(false);
+    };
+
     return (
         <>
             <DropdownMenu>
@@ -79,18 +90,29 @@ export function InvoiceActions({ id, status }: iAppProps) {
                             Download factuur
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleSendReminder}>
-                        <Mail className="size-4 mr-2" /> Reminder e-mail
-                    </DropdownMenuItem>
+                    {status !== InvoiceStatus.PAID && (
+                        <DropdownMenuItem
+                            onClick={() => setReminderDialogOpen(true)}
+                        >
+                            <Mail className="size-4 mr-2" /> Reminder e-mail
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
                         <Trash className="size-4 mr-2" /> Verwijder factuur
                     </DropdownMenuItem>
-                    {status !== "PAID" && (
+                    {status !== "PAID" ? (
                         <DropdownMenuItem
                             onClick={() => setMarkAsPaidDialogOpen(true)}
                         >
                             <CheckCircle className="size-4 mr-2" /> Markeer als
                             betaald
+                        </DropdownMenuItem>
+                    ) : (
+                        <DropdownMenuItem
+                            onClick={() => setMarkAsUnpaidDialogOpen(true)}
+                        >
+                            <CheckCircle className="size-4 mr-2" /> Markeer als
+                            onbetaald
                         </DropdownMenuItem>
                     )}
                 </DropdownMenuContent>
@@ -113,6 +135,17 @@ export function InvoiceActions({ id, status }: iAppProps) {
                 title="Markeer als betaald"
                 description="Weet je zeker dat je deze factuur wilt markeren als betaald?"
                 confirmText="Markeer als betaald"
+                cancelText="Annuleer"
+                variant="default"
+            />
+
+            <ConfirmDialog
+                open={markAsUnpaidDialogOpen}
+                onClose={() => setMarkAsUnpaidDialogOpen(false)}
+                onConfirm={handleMarkAsUnpaid}
+                title="Markeer als onbetaald"
+                description="Weet je zeker dat je deze factuur wilt markeren als onbetaald?"
+                confirmText="Markeer als onbetaald"
                 cancelText="Annuleer"
                 variant="default"
             />

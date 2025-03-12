@@ -20,10 +20,11 @@ export default function Verify() {
                     </div>
 
                     <CardTitle className="text-2xl font-bold">
-                        Check your Email
+                        Controleer je e-mail
                     </CardTitle>
                     <CardDescription>
-                        We have sent a verifcation link to your email address.
+                        We hebben een verificatielink naar je e-mailadres
+                        gestuurd.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -32,7 +33,7 @@ export default function Verify() {
                             <AlertCircle className="size-5 text-yellow-400" />
 
                             <p className="text-sm font-medium text-yellow-700 ml-3">
-                                Be sure to check your spam folder!
+                                Zorg ervoor dat je je spammap controleert!
                             </p>
                         </div>
                     </div>
@@ -45,7 +46,8 @@ export default function Verify() {
                             variant: "outline",
                         })}
                     >
-                        <ArrowLeft className="size-4 mr-2" /> Back to Homepage
+                        <ArrowLeft className="size-4 mr-2" /> Terug naar de
+                        homepage
                     </Link>
                 </CardFooter>
             </Card>

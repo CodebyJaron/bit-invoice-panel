@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Invalid params" }, { status: 404 });
     }
 
-    const invoice = await prisma.invoice.findUnique({
+    const invoice = await prisma.invoice.findFirst({
         where: {
             id: invoiceId,
         },

@@ -96,6 +96,7 @@ model Invoice {
   currency      String
   invoiceNumber Int
   note          String?
+  automaticReminder Boolean @default(false)
   invoiceItems  Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

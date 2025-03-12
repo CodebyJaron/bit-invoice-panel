@@ -1,4 +1,4 @@
-import { CreateInvoiceForm } from "@/components/invoices/create-invoice-form";
+import { CreateEditInvoiceForm } from "@/components/invoices/create-invoice-form";
 import { requireUser } from "@/hooks/use-user";
 import prisma from "@/server/db";
 
@@ -22,7 +22,7 @@ export default async function InvoiceCreationRoute() {
     const session = await requireUser();
     const data = await getUserData(session.user?.id as string);
     return (
-        <CreateInvoiceForm
+        <CreateEditInvoiceForm
             lastName={data?.lastName as string}
             address={data?.address as string}
             email={data?.email as string}

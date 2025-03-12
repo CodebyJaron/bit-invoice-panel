@@ -22,9 +22,10 @@ export default async function Login() {
             <div className="flex h-screen w-full items-center justify-center px-4">
                 <Card className="max-w-sm">
                     <CardHeader>
-                        <CardTitle className="text-2xl">Login</CardTitle>
+                        <CardTitle className="text-2xl">Inloggen</CardTitle>
                         <CardDescription>
-                            Enter your email below to login in to your account
+                            Vul hieronder uw e-mailadres in om in te loggen op
+                            uw account
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -36,7 +37,7 @@ export default async function Login() {
                             className="flex flex-col gap-y-4"
                         >
                             <div className="flex flex-col gap-y-2">
-                                <Label>Email</Label>
+                                <Label>E-mail</Label>
                                 <Input
                                     name="email"
                                     type="email"
@@ -44,7 +45,7 @@ export default async function Login() {
                                     placeholder="hello@hello.com"
                                 />
                             </div>
-                            <SubmitButton text="Login" />
+                            <SubmitButton text="Inloggen" />
                         </form>
                     </CardContent>
                 </Card>

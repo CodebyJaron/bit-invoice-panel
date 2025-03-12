@@ -35,10 +35,10 @@ export default function Onboarding() {
             <Card className="max-w-sm mx-auto">
                 <CardHeader>
                     <CardTitle className="text-xl">
-                        You are almost finished!
+                        Je bent bijna klaar!
                     </CardTitle>
                     <CardDescription>
-                        Enter your information to create an account
+                        Vul je gegevens in om een account aan te maken
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -51,24 +51,24 @@ export default function Onboarding() {
                     >
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label>First Name</Label>
+                                <Label>Voornaam</Label>
                                 <Input
                                     name={fields.firstName.name}
                                     key={fields.firstName.key}
                                     defaultValue={fields.firstName.initialValue}
-                                    placeholder="John"
+                                    placeholder="Jan"
                                 />
                                 <p className="text-red-500 text-sm">
                                     {fields.firstName.errors}
                                 </p>
                             </div>
                             <div className="grid gap-2">
-                                <Label>Last Name</Label>
+                                <Label>Achternaam</Label>
                                 <Input
                                     name={fields.lastName.name}
                                     key={fields.lastName.key}
                                     defaultValue={fields.lastName.initialValue}
-                                    placeholder="Doe"
+                                    placeholder="Jansen"
                                 />
                                 <p className="text-red-500 text-sm">
                                     {fields.lastName.errors}
@@ -77,19 +77,19 @@ export default function Onboarding() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label>Address</Label>
+                            <Label>Adres</Label>
                             <Input
                                 name={fields.address.name}
                                 key={fields.address.key}
                                 defaultValue={fields.address.initialValue}
-                                placeholder="Chad street 123"
+                                placeholder="Voorbeeldstraat 123"
                             />
                             <p className="text-red-500 text-sm">
                                 {fields.address.errors}
                             </p>
                         </div>
 
-                        <SubmitButton text="Finish onboarding" />
+                        <SubmitButton text="Voltooi registratie" />
                     </form>
                 </CardContent>
             </Card>
