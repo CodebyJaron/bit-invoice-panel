@@ -1,4 +1,4 @@
-import { CreateEditInvoiceForm } from "@/components/invoices/create-invoice-form";
+import { CreateEditInvoiceForm } from "@/components/invoices/create-edit-invoice-form";
 import { requireUser } from "@/hooks/use-user";
 import prisma from "@/server/db";
 import { notFound } from "next/navigation";

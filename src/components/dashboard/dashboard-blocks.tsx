@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/hooks/use-user";
+import { formatCurrency } from "@/lib/utils";
 import prisma from "@/server/db";
+import { InvoiceStatus } from "@prisma/client";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
+import { Badge } from "../ui/badge";
 import {
     Table,
     TableBody,
@@ -10,59 +13,65 @@ import {
     TableHeader,
     TableRow,
 } from "../ui/table";
-import { Badge } from "../ui/badge";
-import { InvoiceStatus } from "@prisma/client";
-import { formatCurrency } from "@/lib/utils";
+import { InvoiceChart } from "./invoice-chart";
 
 async function getData(userId: string) {
-    const [data, openInvoices, paidInvoices, recentInvoices] =
-        await Promise.all([
-            prisma.invoice.findMany({
-                where: {
-                    userId: userId,
-                },
-                select: {
-                    total: true,
-                },
-            }),
-            prisma.invoice.findMany({
-                where: {
-                    userId: userId,
-                    status: "PENDING",
-                },
-                select: {
-                    id: true,
-                },
-            }),
-            prisma.invoice.findMany({
-                where: {
-                    userId: userId,
-                    status: "PAID",
-                },
-                select: {
-                    id: true,
-                },
-            }),
-            prisma.invoice.findMany({
-                where: {
-                    userId: userId,
-                },
-                select: {
-                    id: true,
-                    createdAt: true,
-                    total: true,
-                    status: true,
-                    invoiceNumber: true,
-                },
-                orderBy: {
-                    createdAt: "desc",
-                },
-                take: 5,
-            }),
-        ]);
+    const invoices = await prisma.invoice.findMany({
+        where: { userId },
+        select: {
+            id: true,
+            clientName: true,
+            total: true,
+            createdAt: true,
+            status: true,
+            invoiceNumber: true,
+            currency: true,
+        },
+        orderBy: { createdAt: "asc" },
+    });
+
+    interface MonthData {
+        month: string;
+        paid: number;
+        pending: number;
+    }
+
+    const chartData = Object.values(
+        invoices.reduce<{ [month: string]: MonthData }>((acc, invoice) => {
+            const createdAt = new Date(invoice.createdAt);
+            const month =
+                createdAt
+                    .toLocaleString("nl-NL", { month: "long" })
+                    .charAt(0)
+                    .toUpperCase() +
+                createdAt.toLocaleString("nl-NL", { month: "long" }).slice(1);
+
+            if (!acc[month]) {
+                acc[month] = { month, paid: 0, pending: 0 };
+            }
+
+            if (invoice.status === InvoiceStatus.PAID) {
+                acc[month].paid++;
+            }
+            if (invoice.status === InvoiceStatus.PENDING) {
+                acc[month].pending++;
+            }
+
+            return acc;
+        }, {})
+    );
+
+    const openInvoices = invoices.filter(
+        (inv) => inv.status === InvoiceStatus.PENDING
+    );
+    const paidInvoices = invoices.filter(
+        (inv) => inv.status === InvoiceStatus.PAID
+    );
+    const recentInvoices = invoices.slice(-5).reverse();
 
     return {
-        data,
+        invoices,
+        chartData,
         openInvoices,
         paidInvoices,
         recentInvoices,
@@ -76,9 +85,8 @@ interface iAppProps {
 
 export async function DashboardBlocks() {
     const session = await requireUser();
-    const { data, openInvoices, paidInvoices, recentInvoices } = await getData(
-        session.user?.id as string
-    );
+    const { invoices, chartData, openInvoices, paidInvoices, recentInvoices } =
+        await getData(session.user?.id as string);
 
     return (
         <div>
@@ -86,14 +94,14 @@ export async function DashboardBlocks() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Revenue
+                            Totale omzet
                         </CardTitle>
                         <DollarSign className="size-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <h2 className="text-2xl font-bold">
                             {formatCurrency({
-                                amount: data.reduce(
+                                amount: invoices.reduce(
                                     (acc, invoice) => acc + invoice.total,
                                     0
                                 ),
@@ -101,28 +109,30 @@ export async function DashboardBlocks() {
                             })}
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Based on total volume
+                            Gebaseerd op totaal volume
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Invoices Issued
+                            Totaal uitgegeven facturen
                         </CardTitle>
                         <Users className="size-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <h2 className="text-2xl font-bold">+{data.length}</h2>
+                        <h2 className="text-2xl font-bold">
+                            +{invoices.length}
+                        </h2>
                         <p className="text-xs text-muted-foreground">
-                            Total Invoices Isued!
+                            Totaal uitgegeven facturen!
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Paid Invoices
+                            Betaalde facturen
                         </CardTitle>
                         <CreditCard className="size-4 text-muted-foreground" />
                     </CardHeader>
@@ -131,14 +141,14 @@ export async function DashboardBlocks() {
                             +{paidInvoices.length}
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Total Invoices which have been paid!
+                            Facturen die betaald zijn!
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Pending Invoices
+                            Openstaande facturen
                         </CardTitle>
                         <Activity className="size-4 text-muted-foreground" />
                     </CardHeader>
@@ -147,7 +157,7 @@ export async function DashboardBlocks() {
                             +{openInvoices.length}
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Invoices which are currently pending!
+                            Facturen die momenteel openstaan!
                         </p>
                     </CardContent>
                 </Card>
@@ -204,6 +214,8 @@ export async function DashboardBlocks() {
                         </Table>
                     </CardContent>
                 </Card>
+
+                <InvoiceChart data={chartData} />
             </div>
         </div>
     );
