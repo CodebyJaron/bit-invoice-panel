@@ -1,6 +1,6 @@
 import { formatCurrency } from "@/lib/utils";
 import prisma from "@/server/db";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus } from "@/types/invoice-status";
 import { format } from "date-fns";
 
 async function getInvoice(id: string) {

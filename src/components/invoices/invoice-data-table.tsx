@@ -28,7 +28,6 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 import { InvoiceActions } from "./invoice-action";
 import { formatCurrency } from "@/lib/utils";
-import { InvoiceStatus } from "@prisma/client";
 import {
     Pagination,
     PaginationContent,
@@ -38,6 +37,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { InvoiceStatus } from "@/types/invoice-status";
 
 interface Invoice {
     id: string;

@@ -25,7 +25,7 @@ import {
     MarkAsUnpaidAction,
     SendReminderAction,
 } from "@/actions/invoice";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus } from "@/types/invoice-status";
 
 interface iAppProps {
     id: string;

@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/hooks/use-user";
 import { formatCurrency } from "@/lib/utils";
 import prisma from "@/server/db";
-import { InvoiceStatus } from "@prisma/client";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 import { Badge } from "../ui/badge";
 import {
@@ -14,6 +13,7 @@ import {
     TableRow,
 } from "../ui/table";
 import { InvoiceChart } from "./invoice-chart";
+import { InvoiceStatus } from "@/types/invoice-status";
 
 async function getData(userId: string) {
     const invoices = await prisma.invoice.findMany({
