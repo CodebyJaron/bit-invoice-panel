@@ -22,7 +22,7 @@ export const sendInvoiceEmail = async (
     dueDate.setDate(dueDate.getDate() + invoice.dueDate);
     const formattedDueDate = dueDate.toLocaleDateString("nl-NL");
 
-    const invoiceUrl = `http://localhost:3000/pdf/${invoiceId}/`;
+    const invoiceUrl = `http://localhost:3000/api/pdf?invoiceId=${invoiceId}/`;
 
     const sender = {
         email: "me@codebyjaron.nl",
@@ -62,14 +62,14 @@ export const sendInvoiceEmail = async (
         <div class="container">
           <div class="header">Herinnering: Openstaande Factuur</div>
           <div class="content">
-            Beste klant,<br/><br/>
+            Beste ${invoice.clientName},<br/><br/>
             Dit is een vriendelijke herinnering dat uw factuur nog openstaat. Wij verzoeken u de betaling te voldoen voor <strong>${formattedDueDate}</strong>.<br/><br/>
             Klik op de onderstaande knop om uw factuur te downloaden.
           </div>
           <a href="${invoiceUrl}" class="button">Download Factuur</a>
           <div class="content" style="margin-top: 30px;">
             Met vriendelijke groet,<br/>
-            Bit-Facturen
+            ${invoice.fromName}
           </div>
         </div>
       </body>
@@ -103,14 +103,14 @@ export const sendInvoiceEmail = async (
         <div class="container">
           <div class="header">Factuur Aangemaakt</div>
           <div class="content">
-            Beste klant,<br/><br/>
+            Beste ${invoice.clientName},<br/><br/>
             Er is een nieuwe factuur voor u aangemaakt. U dient deze te voldoen voor <strong>${formattedDueDate}</strong>.<br/><br/>
             Klik op de onderstaande knop om uw factuur te downloaden.
           </div>
           <a href="${invoiceUrl}" class="button">Download Factuur</a>
           <div class="content" style="margin-top: 30px;">
             Met vriendelijke groet,<br/>
-            Bit-Facturen
+            ${invoice.fromName}
           </div>
         </div>
       </body>
@@ -119,25 +119,23 @@ export const sendInvoiceEmail = async (
 
     const textContent = isReminder
         ? `
-Beste klant,
+Beste ${invoice.clientName},
 
 Dit is een herinnering dat uw factuur nog openstaat. Wij verzoeken u vriendelijk om de betaling te voldoen voor ${formattedDueDate}.
 Download uw factuur via de volgende link: ${invoiceUrl}
 
 Met vriendelijke groet,
-Bit-Facturen
+${invoice.fromName}
     `
         : `
-Beste klant,
+Beste ${invoice.clientName},
 
 Er is een nieuwe factuur voor u aangemaakt die u dient te voldoen voor ${formattedDueDate}.
 Download uw factuur via de volgende link: ${invoiceUrl}
 
 Met vriendelijke groet,
-Bit-Facturen
-    `;
-
-    console.log(process.env.MAILTRAP_TOKEN);
+${invoice.fromName}
+`;
 
     try {
         await emailClient.send({
