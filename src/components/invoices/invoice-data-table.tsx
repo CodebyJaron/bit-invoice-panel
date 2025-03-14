@@ -45,7 +45,7 @@ interface Invoice {
     clientName: string;
     total: number;
     createdAt: string | Date;
-    status: InvoiceStatus;
+    status: "PAID" | "PENDING";
     currency: string;
 }
 
