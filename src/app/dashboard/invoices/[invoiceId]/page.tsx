@@ -34,9 +34,11 @@ async function getUserData(userId: string) {
     return data;
 }
 
-type Params = Promise<{ invoiceId: string }>;
-
-export default async function EditInvoiceRoute({ params }: { params: Params }) {
+export default async function EditInvoiceRoute({
+    params,
+}: {
+    params: Promise<{ invoiceId: string }>;
+}) {
     const { invoiceId } = await params;
     const session = await requireUser();
 

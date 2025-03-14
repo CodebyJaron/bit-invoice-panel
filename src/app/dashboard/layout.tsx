@@ -14,7 +14,6 @@ import { requireUser } from "@/hooks/use-user";
 import { signOut } from "@/server/auth";
 import prisma from "@/server/db";
 import { Menu, User2 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";

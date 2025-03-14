@@ -20,9 +20,11 @@ async function getInvoice(id: string) {
 export default async function InvoicePDF({
     params,
 }: {
-    params: { invoiceId: string };
+    params: Promise<{ invoiceId: string }>;
 }) {
-    const invoice = await getInvoice(params.invoiceId);
+    const { invoiceId } = await params;
+
+    const invoice = await getInvoice(invoiceId);
     const dueDate = new Date(invoice.date);
     dueDate.setDate(dueDate.getDate() + invoice.dueDate);
 
@@ -101,7 +103,9 @@ export default async function InvoicePDF({
                                 <td className="py-2 px-4 text-right">
                                     {formatCurrency({
                                         amount: item.rate,
-                                        currency: invoice.currency as any,
+                                        currency: invoice.currency as
+                                            | "EUR"
+                                            | "USD",
                                     })}
                                 </td>
                                 <td className="py-2 px-4 text-right">
@@ -124,7 +128,7 @@ export default async function InvoicePDF({
                         <td className="py-2 px-4 text-right font-bold">
                             {formatCurrency({
                                 amount: totalAmount,
-                                currency: invoice.currency as any,
+                                currency: invoice.currency as "EUR" | "USD",
                             })}
                         </td>
                     </tr>
