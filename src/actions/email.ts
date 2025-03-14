@@ -22,7 +22,7 @@ export const sendInvoiceEmail = async (
     dueDate.setDate(dueDate.getDate() + invoice.dueDate);
     const formattedDueDate = dueDate.toLocaleDateString("nl-NL");
 
-    const invoiceUrl = `http://localhost:3000/api/pdf?invoiceId=${invoiceId}/`;
+    const invoiceUrl = `${process.env.APP_URL}/api/pdf?invoiceId=${invoiceId}/`;
 
     const sender = {
         email: "me@codebyjaron.nl",
