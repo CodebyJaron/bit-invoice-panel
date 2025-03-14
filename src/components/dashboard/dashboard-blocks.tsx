@@ -15,17 +15,8 @@ import {
 import { InvoiceChart } from "./invoice-chart";
 import { InvoiceStatus } from "@/types/invoice-status";
 
-interface Invoice {
-    id: string;
-    clientName: string;
-    total: number;
-    createdAt: Date;
-    status: InvoiceStatus;
-    invoiceNumber: string;
-    currency: string;
-}
 async function getData(userId: string) {
-    const invoices: Invoice[] = await prisma.invoice.findMany({
+    const invoices = await prisma.invoice.findMany({
         where: { userId },
         select: {
             id: true,
@@ -46,40 +37,35 @@ async function getData(userId: string) {
     }
 
     const chartData = Object.values(
-        invoices.reduce(
-            (acc: { [month: string]: MonthData }, invoice: Invoice) => {
-                const createdAt = new Date(invoice.createdAt);
-                const month =
-                    createdAt
-                        .toLocaleString("nl-NL", { month: "long" })
-                        .charAt(0)
-                        .toUpperCase() +
-                    createdAt
-                        .toLocaleString("nl-NL", { month: "long" })
-                        .slice(1);
+        invoices.reduce((acc: { [month: string]: MonthData }, invoice) => {
+            const createdAt = new Date(invoice.createdAt);
+            const month =
+                createdAt
+                    .toLocaleString("nl-NL", { month: "long" })
+                    .charAt(0)
+                    .toUpperCase() +
+                createdAt.toLocaleString("nl-NL", { month: "long" }).slice(1);
 
-                if (!acc[month]) {
-                    acc[month] = { month, paid: 0, pending: 0 };
-                }
+            if (!acc[month]) {
+                acc[month] = { month, paid: 0, pending: 0 };
+            }
 
-                if (invoice.status === InvoiceStatus.PAID) {
-                    acc[month].paid++;
-                }
-                if (invoice.status === InvoiceStatus.PENDING) {
-                    acc[month].pending++;
-                }
+            if (invoice.status === InvoiceStatus.PAID) {
+                acc[month].paid++;
+            }
+            if (invoice.status === InvoiceStatus.PENDING) {
+                acc[month].pending++;
+            }
 
-                return acc;
-            },
-            {}
-        )
+            return acc;
+        }, {})
     );
 
     const openInvoices = invoices.filter(
-        (inv: Invoice) => inv.status === InvoiceStatus.PENDING
+        (inv) => inv.status === InvoiceStatus.PENDING
     );
     const paidInvoices = invoices.filter(
-        (inv: Invoice) => inv.status === InvoiceStatus.PAID
+        (inv) => inv.status === InvoiceStatus.PAID
     );
     const recentInvoices = invoices.slice(-5).reverse();
 

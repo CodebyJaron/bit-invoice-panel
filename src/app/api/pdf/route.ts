@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/server/db";
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
