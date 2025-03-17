@@ -1,23 +1,72 @@
-# bit-invoice-panel
+## Functionaliteiten
 
-## Inleiding
+-   📧 Authenticatie via Magic Link
+-   📊 Dashboard voor factuurbeheer
+-   📄 PDF-generatie voor facturen
+-   📱 Responsive design
+-   🔒 Beveiligde omgeving
 
-Dit project is ontwikkeld als onderdeel van mijn keuzedeel en is gebouwd met
-Next.js.
+## Technologieën
 
-## Wat voor technologieën zijn er gebruikt?
+Het project maakt gebruik van moderne technologieën:
 
--   Magic link | Dit is de modernste techniek omtrent authenticatie aangezien
-    het geen wachtwoorden nodig is en alleen je e-mail
--   Mailtrap | Dit is een hele goede e-mail provider
--   Conform-to | Dit is een moderne manier van form handling
--   Puppeteer PDF | Dit is een veel voorkomende manier om PDF's te laten
-    uitdraaien.
--   Shadcn | Dit is een moderne UI libary met vele components die ik heb
-    gebruikt.
+-   **Next.js 15** - React framework voor productie
+-   **Next-auth** - Wachtwoordloze authenticatie via e-mail
+-   **Mailtrap** - E-mail service voor het versturen van magic links
+-   **Conform-to** - Moderne form handling en validatie
+-   **Puppeteer** - PDF generatie voor facturen
+-   **Shadcn/UI** - Moderne UI componenten bibliotheek
+-   **Prisma** - Type-safe database ORM
+-   **TailwindCSS** - Utility-first CSS framework
 
-## Hoe start je het project?
+## Installatie
 
--   `npm install`
--   Vul de .env met juiste gegevens in.
--   `npm run dev`
+1. Clone het project
+
+```bash
+git clone https://github.com/CodebyJaron/bit-invoice-panel.git
+cd bit-invoice-panel
+```
+
+2. Installeer dependencies
+
+```bash
+npm install
+```
+
+3. Configureer environment variables
+
+```bash
+# Maak een kopie van het .env.example bestand
+cp .env.example .env
+# Vul de benodigde gegevens in
+```
+
+4. Set up de database
+
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+5. Start de development server
+
+```bash
+npm run dev
+```
+
+## Environment Variables
+
+Maak een `.env` bestand aan met de volgende variabelen:
+
+```env
+NODE_ENV="development"
+DATABASE_URL="..."
+AUTH_SECRET="..."
+MAILTRAP_TOKEN="..."
+EMAIL_SERVER_HOST=".."
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER="..."
+EMAIL_SERVER_PASSWORD="..."
+EMAIL_FROM="..."
+```
